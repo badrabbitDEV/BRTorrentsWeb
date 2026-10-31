@@ -1,159 +1,167 @@
 
-const LANGUAGES = Object.freeze({
-  "pt-BR": "Português (Brasil)",
-  en: "English",
-  es: "Español"
-});
-
-const QUALITIES = Object.freeze({
-  "4k": "4K",
-  "1080p": "1080p",
-  "720p": "720p",
-  "480p": "480p"
-});
+const CATALOGS = Object.freeze([
+  "populares_movie",
+  "populares_series",
+  "recentes_movie",
+  "recentes_series"
+]);
 
 const DEFAULTS = Object.freeze({
-  name: "",
-  language: "pt-BR",
-  quality: "1080p",
-  subtitles: true,
-  enabled: true
+  qualities: ["4k", "1080p", "720p", "sd"],
+  audio: ["dublado", "legendado"],
+  debrid: "none",
+  apiKey: ""
 });
 
-function normalizeData(data = {}) {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    data = {};
-  }
+/*
+ * IMPORTANTE:
+ * Troque pelo domínio real do addon quando o backend estiver publicado.
+ * Não use o domínio do GitHub Pages aqui.
+ */
+export const ADDON_BASE_URL = "https://SEU-DOMINIO-DO-ADDON";
 
-  const name =
-    typeof data.name === "string"
-      ? data.name.normalize("NFC").trim().replace(/\s+/g, " ").slice(0, 60)
-      : DEFAULTS.name;
+export function buildManifestUrl(data = {}) {
+  const qualities = Array.isArray(data.qualities)
+    ? data.qualities.filter(value =>
+        ["4k", "1080p", "720p", "sd"].includes(value)
+      )
+    : DEFAULTS.qualities;
 
-  const language = Object.hasOwn(LANGUAGES, data.language)
-    ? data.language
-    : DEFAULTS.language;
+  const audio = Array.isArray(data.audio)
+    ? data.audio.filter(value =>
+        ["dublado", "legendado"].includes(value)
+      )
+    : DEFAULTS.audio;
 
-  const quality = Object.hasOwn(QUALITIES, data.quality)
-    ? data.quality
-    : DEFAULTS.quality;
+  const selectedQualities = qualities.length
+    ? qualities.join(",")
+    : DEFAULTS.qualities.join(",");
 
-  return Object.freeze({
-    name,
-    language,
-    quality,
-    subtitles: typeof data.subtitles === "boolean"
-      ? data.subtitles
-      : DEFAULTS.subtitles,
-    enabled: typeof data.enabled === "boolean"
-      ? data.enabled
-      : DEFAULTS.enabled
-  });
+  const selectedAudio = audio.length
+    ? audio.join(",")
+    : DEFAULTS.audio.join(",");
+
+  const catalogList = CATALOGS.join(",");
+
+  const base = ADDON_BASE_URL.replace(/\/+$/, "");
+
+  return (
+    `${base}/qualities=${selectedQualities}` +
+    `%7Caudio=${selectedAudio}` +
+    `%7Ccatalogs=${catalogList}` +
+    `/manifest.json`
+  );
 }
 
 function createElement(tag, className, text) {
   const element = document.createElement(tag);
 
-  if (className) {
-    element.className = className;
-  }
-
-  element.textContent = text;
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
 
   return element;
 }
 
-function createPreviewRow(label, value) {
-  const row = createElement("div", "preview-row", "");
+function buildPreview(data, actions = {}) {
+  const section = createElement("section", "config-preview");
+  section.setAttribute("aria-label", "Preview do Manifest");
 
-  const labelElement = createElement(
-    "span",
-    "preview-label",
-    label
+  const header = createElement("div", "manifest-preview-header");
+
+  const titleGroup = createElement("div", "manifest-title-group");
+  titleGroup.append(
+    createElement("span", "manifest-icon", "{ }"),
+    createElement("div", "manifest-title-content")
   );
 
-  const valueElement = createElement(
-    "strong",
-    "preview-value",
-    value
+  const titleContent = titleGroup.querySelector(".manifest-title-content");
+  titleContent.append(
+    createElement("h3", "preview-title", "Preview do Manifest"),
+    createElement("p", "preview-description", "Seu endereço de instalação será gerado automaticamente.")
   );
 
-  row.append(labelElement, valueElement);
+  const status = createElement("span", "manifest-status", "URL");
+  header.append(titleGroup, status);
 
-  return row;
-}
+  const urlBox = createElement("div", "manifest-url-box");
+  const url = buildManifestUrl(data);
 
-function buildPreview(data) {
-  const container = createElement("section", "config-preview", "");
+  const urlText = createElement("code", "manifest-url", url);
+  urlText.setAttribute("aria-label", "Endereço do Manifest");
 
-  container.setAttribute("aria-label", "Prévia da configuração");
+  urlBox.append(urlText);
 
-  const header = createElement("div", "preview-header", "");
-
-  const title = createElement(
-    "h3",
-    "preview-title",
-    "Prévia da configuração"
-  );
-
-  const description = createElement(
-    "p",
-    "preview-description",
-    "Confira suas preferências antes de salvar."
-  );
-
-  header.append(title, description);
-
-  const content = createElement("div", "preview-content", "");
-
-  const displayName = data.name || "Minha configuração";
-
-  content.append(
-    createPreviewRow("Nome", displayName),
-    createPreviewRow("Idioma", LANGUAGES[data.language]),
-    createPreviewRow("Qualidade", QUALITIES[data.quality]),
-    createPreviewRow(
-      "Legendas",
-      data.subtitles ? "Preferidas" : "Desativadas"
+  const footer = createElement("div", "manifest-preview-footer");
+  footer.append(
+    createElement(
+      "span",
+      "manifest-footer-dot",
+      "●"
     ),
-    createPreviewRow(
-      "Status",
-      data.enabled ? "Ativada" : "Desativada"
+    createElement(
+      "p",
+      "",
+      "A URL acompanha automaticamente suas escolhas."
     )
   );
 
-  const footer = createElement(
-    "p",
-    "preview-footer",
-    "As preferências serão aplicadas conforme as fontes disponíveis."
+  const actionsContainer = createElement("div", "manifest-actions");
+
+  const installButton = createElement(
+    "button",
+    "manifest-install-button",
+    "Instalar no Stremio/Nuvio"
+  );
+  installButton.type = "button";
+
+  const installIcon = createElement("span", "button-icon", "↗");
+  installButton.prepend(installIcon);
+
+  installButton.addEventListener("click", () => {
+    if (typeof actions.onInstall === "function") {
+      actions.onInstall(url);
+    }
+  });
+
+  const copyButton = createElement(
+    "button",
+    "manifest-copy-button",
+    "Copiar Manifest"
+  );
+  copyButton.type = "button";
+
+  const copyIcon = createElement("span", "button-icon", "⧉");
+  copyButton.prepend(copyIcon);
+
+  copyButton.addEventListener("click", async () => {
+    if (typeof actions.onCopy === "function") {
+      await actions.onCopy(url);
+    }
+  });
+
+  actionsContainer.append(installButton, copyButton);
+
+  section.append(
+    header,
+    urlBox,
+    footer,
+    actionsContainer
   );
 
-  container.append(header, content, footer);
-
-  return container;
+  return section;
 }
 
-export function Preview(initialData = {}) {
-  const data = normalizeData(initialData);
-
-  return buildPreview(data);
+export function Preview(initialData = {}, actions = {}) {
+  return buildPreview(initialData, actions);
 }
 
-export function updatePreview(section, input = {}) {
+export function updatePreview(section, data = {}, actions = {}) {
   if (!(section instanceof HTMLElement)) {
-    throw new TypeError("Elemento de prévia inválido.");
+    throw new TypeError("Elemento de preview inválido.");
   }
 
-  const data = normalizeData(input);
-  const newPreview = buildPreview(data);
+  const updated = buildPreview(data, actions);
+  section.replaceWith(updated);
 
-  section.replaceChildren(...newPreview.childNodes);
-
-  section.className = newPreview.className;
-  section.setAttribute(
-    "aria-label",
-    newPreview.getAttribute("aria-label")
-  );
-
-  return data;
+  return updated;
 }
