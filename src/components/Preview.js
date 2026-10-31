@@ -8,29 +8,26 @@ const CATALOGS = Object.freeze([
 
 const DEFAULTS = Object.freeze({
   qualities: ["4k", "1080p", "720p", "sd"],
-  audio: ["dublado", "legendado"],
-  debrid: "none",
-  apiKey: ""
+  audio: ["dublado", "legendado"]
 });
+
+const ALLOWED_QUALITIES = new Set(["4k", "1080p", "720p", "sd"]);
+const ALLOWED_AUDIO = new Set(["dublado", "legendado"]);
 
 /*
  * IMPORTANTE:
- * Troque pelo domínio real do addon quando o backend estiver publicado.
- * Não use o domínio do GitHub Pages aqui.
+ * Configure aqui o domínio REAL do backend do addon.
+ * Não coloque o domínio do GitHub Pages.
  */
 export const ADDON_BASE_URL = "https://SEU-DOMINIO-DO-ADDON";
 
 export function buildManifestUrl(data = {}) {
   const qualities = Array.isArray(data.qualities)
-    ? data.qualities.filter(value =>
-        ["4k", "1080p", "720p", "sd"].includes(value)
-      )
+    ? data.qualities.filter(value => ALLOWED_QUALITIES.has(value))
     : DEFAULTS.qualities;
 
   const audio = Array.isArray(data.audio)
-    ? data.audio.filter(value =>
-        ["dublado", "legendado"].includes(value)
-      )
+    ? data.audio.filter(value => ALLOWED_AUDIO.has(value))
     : DEFAULTS.audio;
 
   const selectedQualities = qualities.length
@@ -41,19 +38,17 @@ export function buildManifestUrl(data = {}) {
     ? audio.join(",")
     : DEFAULTS.audio.join(",");
 
-  const catalogList = CATALOGS.join(",");
-
   const base = ADDON_BASE_URL.replace(/\/+$/, "");
 
   return (
     `${base}/qualities=${selectedQualities}` +
     `%7Caudio=${selectedAudio}` +
-    `%7Ccatalogs=${catalogList}` +
+    `%7Ccatalogs=${CATALOGS.join(",")}` +
     `/manifest.json`
   );
 }
 
-function createElement(tag, className, text) {
+function createElement(tag, className = "", text) {
   const element = document.createElement(tag);
 
   if (className) element.className = className;
@@ -62,60 +57,88 @@ function createElement(tag, className, text) {
   return element;
 }
 
-function buildPreview(data, actions = {}) {
+function createIcon(symbol, className = "manifest-action-icon") {
+  const icon = createElement("span", className, symbol);
+  icon.setAttribute("aria-hidden", "true");
+  return icon;
+}
+
+function buildPreview(data = {}, actions = {}) {
   const section = createElement("section", "config-preview");
   section.setAttribute("aria-label", "Preview do Manifest");
 
   const header = createElement("div", "manifest-preview-header");
 
+  const identity = createElement("div", "manifest-identity");
+
+  const icon = createElement("div", "manifest-main-icon", "{}");
+  icon.setAttribute("aria-hidden", "true");
+
   const titleGroup = createElement("div", "manifest-title-group");
+
   titleGroup.append(
-    createElement("span", "manifest-icon", "{ }"),
-    createElement("div", "manifest-title-content")
-  );
-
-  const titleContent = titleGroup.querySelector(".manifest-title-content");
-  titleContent.append(
     createElement("h3", "preview-title", "Preview do Manifest"),
-    createElement("p", "preview-description", "Seu endereço de instalação será gerado automaticamente.")
-  );
-
-  const status = createElement("span", "manifest-status", "URL");
-  header.append(titleGroup, status);
-
-  const urlBox = createElement("div", "manifest-url-box");
-  const url = buildManifestUrl(data);
-
-  const urlText = createElement("code", "manifest-url", url);
-  urlText.setAttribute("aria-label", "Endereço do Manifest");
-
-  urlBox.append(urlText);
-
-  const footer = createElement("div", "manifest-preview-footer");
-  footer.append(
-    createElement(
-      "span",
-      "manifest-footer-dot",
-      "●"
-    ),
     createElement(
       "p",
-      "",
-      "A URL acompanha automaticamente suas escolhas."
+      "preview-description",
+      "Seu endereço de instalação será gerado automaticamente."
     )
   );
+
+  identity.append(icon, titleGroup);
+
+  const status = createElement("span", "manifest-status");
+  status.append(
+    createIcon("●", "manifest-status-dot"),
+    createElement("span", "", "PRONTO")
+  );
+
+  header.append(identity, status);
+
+  const urlArea = createElement("div", "manifest-url-area");
+
+  const urlHeading = createElement("div", "manifest-url-heading");
+  urlHeading.append(
+    createElement("span", "manifest-url-label", "ENDEREÇO DO MANIFEST"),
+    createElement("span", "manifest-url-type", "JSON")
+  );
+
+  const urlBox = createElement("div", "manifest-url-box");
+
+  const url = buildManifestUrl(data);
+  const urlText = createElement("code", "manifest-url", url);
+
+  urlText.setAttribute("aria-label", "Endereço do Manifest");
+  urlText.setAttribute("tabindex", "0");
+
+  urlBox.append(urlText);
+  urlArea.append(urlHeading, urlBox);
+
+  const footer = createElement("div", "manifest-preview-footer");
+
+  const footerIndicator = createElement("span", "manifest-footer-indicator");
+  footerIndicator.setAttribute("aria-hidden", "true");
+
+  const footerText = createElement(
+    "p",
+    "",
+    "A URL acompanha automaticamente suas escolhas."
+  );
+
+  footer.append(footerIndicator, footerText);
 
   const actionsContainer = createElement("div", "manifest-actions");
 
   const installButton = createElement(
     "button",
-    "manifest-install-button",
-    "Instalar no Stremio/Nuvio"
+    "manifest-install-button"
   );
-  installButton.type = "button";
 
-  const installIcon = createElement("span", "button-icon", "↗");
-  installButton.prepend(installIcon);
+  installButton.type = "button";
+  installButton.append(
+    createIcon("↗"),
+    createElement("span", "", "Instalar no Stremio / Nuvio")
+  );
 
   installButton.addEventListener("click", () => {
     if (typeof actions.onInstall === "function") {
@@ -125,13 +148,14 @@ function buildPreview(data, actions = {}) {
 
   const copyButton = createElement(
     "button",
-    "manifest-copy-button",
-    "Copiar Manifest"
+    "manifest-copy-button"
   );
-  copyButton.type = "button";
 
-  const copyIcon = createElement("span", "button-icon", "⧉");
-  copyButton.prepend(copyIcon);
+  copyButton.type = "button";
+  copyButton.append(
+    createIcon("⧉"),
+    createElement("span", "", "Copiar Manifest")
+  );
 
   copyButton.addEventListener("click", async () => {
     if (typeof actions.onCopy === "function") {
@@ -143,7 +167,7 @@ function buildPreview(data, actions = {}) {
 
   section.append(
     header,
-    urlBox,
+    urlArea,
     footer,
     actionsContainer
   );
