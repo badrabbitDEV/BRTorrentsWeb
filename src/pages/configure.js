@@ -4,179 +4,178 @@ import { Footer } from "../components/Footer.js";
 import { ConfigForm } from "../components/ConfigForm.js";
 import {
   Preview,
-  updatePreview
+  updatePreview,
+  buildManifestUrl,
+  ADDON_BASE_URL
 } from "../components/Preview.js";
-
-const PAGE_DEFAULTS = Object.freeze({
-  name: "",
-  language: "pt-BR",
-  quality: "1080p",
-  subtitles: true,
-  enabled: true
-});
 
 function createElement(tag, className, text) {
   const element = document.createElement(tag);
 
-  if (className) {
-    element.className = className;
-  }
-
-  if (text !== undefined && text !== null) {
-    element.textContent = String(text);
-  }
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
 
   return element;
 }
 
 function createBreadcrumb() {
   const nav = createElement("nav", "configure-breadcrumb");
-
   nav.setAttribute("aria-label", "Navegação estrutural");
 
-  const homeLink = createElement("a", "", "Início");
-  homeLink.href = "/";
+  const home = createElement("a", "", "Início");
+  home.href = "/";
 
   const separator = createElement("span", "", "/");
   separator.setAttribute("aria-hidden", "true");
 
-  const current = createElement(
-    "span",
-    "breadcrumb-current",
-    "Configurar"
-  );
-
+  const current = createElement("span", "breadcrumb-current", "Configurar");
   current.setAttribute("aria-current", "page");
 
-  nav.append(homeLink, separator, current);
+  nav.append(home, separator, current);
 
   return nav;
 }
 
 function createPageHeader() {
-  const section = createElement(
-    "section",
-    "configure-heading"
-  );
+  const section = createElement("section", "configure-heading");
 
-  const eyebrow = createElement(
-    "span",
-    "section-eyebrow",
-    "BRTORRENTS CONFIGURATOR"
+  section.append(
+    createElement("span", "section-eyebrow", "BRTORRENTS CONFIGURATOR"),
+    createElement("h1", "configure-title", "Configure seu addon"),
+    createElement(
+      "p",
+      "configure-description",
+      "Personalize suas preferências e gere seu Manifest de instalação."
+    )
   );
-
-  const title = createElement(
-    "h1",
-    "configure-title",
-    "Configure seu addon"
-  );
-
-  const description = createElement(
-    "p",
-    "configure-description",
-    "Personalize suas opções e prepare seu link de instalação."
-  );
-
-  section.append(eyebrow, title, description);
 
   return section;
 }
 
 function createPanel(title, description, content) {
   const panel = createElement("section", "configure-panel");
+  const heading = createElement("div", "configure-panel-heading");
 
-  const heading = createElement(
-    "div",
-    "configure-panel-heading"
+  heading.append(
+    createElement("h2", "", title),
+    createElement("p", "", description)
   );
-
-  const panelTitle = createElement("h2", "", title);
-
-  const panelDescription = createElement(
-    "p",
-    "",
-    description
-  );
-
-  heading.append(panelTitle, panelDescription);
 
   panel.append(heading, content);
-
   return panel;
 }
 
 function createInformation() {
-  const box = createElement(
-    "aside",
-    "configure-information"
+  const box = createElement("aside", "configure-information");
+
+  box.append(
+    createElement("span", "information-icon", "ⓘ"),
+    createElement(
+      "p",
+      "information-text",
+      "As opções disponíveis dependem das fontes e integrações suportadas pelo servidor do BRTorrents."
+    )
   );
-
-  const icon = createElement("span", "information-icon", "ⓘ");
-
-  icon.setAttribute("aria-hidden", "true");
-
-  const text = createElement(
-    "p",
-    "information-text",
-    "A disponibilidade das qualidades e idiomas depende das fontes compatíveis com o addon."
-  );
-
-  box.append(icon, text);
 
   return box;
 }
 
+async function copyText(value) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const temporary = document.createElement("textarea");
+  temporary.value = value;
+  temporary.setAttribute("readonly", "");
+  temporary.style.position = "fixed";
+  temporary.style.opacity = "0";
+
+  document.body.append(temporary);
+  temporary.select();
+
+  const copied = document.execCommand("copy");
+  temporary.remove();
+
+  if (!copied) {
+    throw new Error("Não foi possível copiar. Copie o endereço manualmente.");
+  }
+}
+
 function createConfigurationLayout() {
-  const layout = createElement(
-    "div",
-    "configure-layout"
-  );
+  const layout = createElement("div", "configure-layout");
 
-  const formColumn = createElement(
-    "div",
-    "configure-form-column"
-  );
-
-  const previewColumn = createElement(
-    "div",
-    "configure-preview-column"
-  );
+  const formColumn = createElement("div", "configure-form-column");
+  const previewColumn = createElement("div", "configure-preview-column");
 
   const previewHeading = createElement(
-    "h2",
-    "preview-column-title",
-    "Prévia da configuração"
+    "div",
+    "preview-column-heading"
   );
 
-  const previewDescription = createElement(
-    "p",
-    "preview-column-description",
-    "Confira suas opções selecionadas."
+  previewHeading.append(
+    createElement("span", "section-eyebrow", "INSTALLATION"),
+    createElement("h2", "preview-column-title", "Seu Manifest"),
+    createElement(
+      "p",
+      "preview-column-description",
+      "Confira o endereço gerado antes de instalar."
+    )
   );
 
-  const previewContainer = Preview(PAGE_DEFAULTS);
+  let currentData = {
+    qualities: ["4k", "1080p", "720p", "sd"],
+    audio: ["dublado", "legendado"],
+    debrid: "none",
+    apiKey: ""
+  };
 
-  previewColumn.append(
-    previewHeading,
-    previewDescription,
-    previewContainer
-  );
+  const actions = {
+    onInstall(url) {
+      if (ADDON_BASE_URL.includes("SEU-DOMINIO-DO-ADDON")) {
+        window.alert("Configure primeiro o domínio real do addon em Preview.js.");
+        return;
+      }
+
+      const stremioUrl = `stremio://${url.replace(/^https?:\/\//, "")}`;
+      window.location.href = stremioUrl;
+    },
+
+    async onCopy(url) {
+      if (ADDON_BASE_URL.includes("SEU-DOMINIO-DO-ADDON")) {
+        window.alert("Configure primeiro o domínio real do addon em Preview.js.");
+        return;
+      }
+
+      try {
+        await copyText(url);
+        window.alert("Manifest copiado com sucesso!");
+      } catch (error) {
+        window.alert(error.message);
+      }
+    }
+  };
+
+  let preview = Preview(currentData, actions);
 
   const form = ConfigForm({
     onChange(data) {
-      updatePreview(previewContainer, data);
-    },
+      currentData = data;
 
-    async onSubmit() {
-      throw new Error(
-        "A conexão com o servidor ainda não foi configurada."
+      const nextPreview = updatePreview(
+        preview,
+        currentData,
+        actions
       );
+
+      preview = nextPreview;
     }
   });
 
   const formPanel = createPanel(
     "Suas configurações",
-    "Escolha as opções desejadas.",
+    "Escolha as opções desejadas para seu addon.",
     form
   );
 
@@ -185,23 +184,21 @@ function createConfigurationLayout() {
     createInformation()
   );
 
+  previewColumn.append(
+    previewHeading,
+    preview
+  );
+
   layout.append(formColumn, previewColumn);
 
   return layout;
 }
 
 function createMain() {
-  const main = createElement(
-    "main",
-    "configure-main"
-  );
-
+  const main = createElement("main", "configure-main");
   main.id = "main-content";
 
-  const container = createElement(
-    "div",
-    "configure-container"
-  );
+  const container = createElement("div", "configure-container");
 
   container.append(
     createBreadcrumb(),
@@ -210,15 +207,11 @@ function createMain() {
   );
 
   main.append(container);
-
   return main;
 }
 
 export function Configure() {
-  const page = createElement(
-    "div",
-    "configure-page"
-  );
+  const page = createElement("div", "configure-page");
 
   const skipLink = createElement(
     "a",
