@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- =====================================================
+       BRTORRENTS — MAIN HTML DOCUMENT
+       Version: 1.0.0
+       ===================================================== -->
+
+  <!-- Metadados essenciais -->
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="description"
+    content="Configure e personalize seu addon BRTorrents com uma interface simples, rápida e intuitiva."
+  >
+
+  <meta name="theme-color" content="#090B0A">
+
+  <meta name="color-scheme" content="dark">
+
+  <meta name="application-name" content="BRTorrents">
+
+  <meta name="author" content="BRTorrents">
+
+  <meta name="robots" content="index, follow">
+
+  <!-- =====================================================
+       CONFIGURAÇÃO DA API
+       Substituir pelo endereço real do Cloud Run.
+       ===================================================== -->
+
+  <meta
+    name="brt-api-base"
+    content="https://SUA-API-DO-CLOUD-RUN"
+  >
+
+  <!-- =====================================================
+       IDENTIDADE VISUAL
+       ===================================================== -->
+
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="/BRTorrentsWeb/favicon.svg"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="/BRTorrentsWeb/logo.svg"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <!-- =====================================================
+       FONTES
+       ===================================================== -->
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- =====================================================
+       TÍTULO
+       ===================================================== -->
+
+  <title>BRTorrents — Configurador</title>
+
+  <!-- =====================================================
+       SEGURANÇA
+       ===================================================== -->
+
+  <meta
+    http-equiv="X-Content-Type-Options"
+    content="nosniff"
+  >
+
+  <meta
+    name="referrer"
+    content="no-referrer"
+  >
+
+  <!-- =====================================================
+       ESTILIZAÇÃO INICIAL
+       Evita flash de fundo claro.
+       ===================================================== -->
+
+  <style>
+    :root {
+      color-scheme: dark;
+      background: #090B0A;
+    }
+
+    html,
+    body {
+      min-width: 320px;
+      min-height: 100%;
+      margin: 0;
+      background: #090B0A;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    #app {
+      min-height: 100vh;
+    }
+
+    .initial-loader {
+      display: grid;
+      min-height: 100vh;
+      place-content: center;
+      justify-items: center;
+      gap: 16px;
+      color: #A5B0A8;
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+    }
+
+    .initial-loader-indicator {
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(67, 216, 121, 0.15);
+      border-top-color: #43D879;
+      border-radius: 50%;
+      animation: brt-loading 0.8s linear infinite;
+    }
+
+    @keyframes brt-loading {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .initial-loader-indicator {
+        animation: none;
+      }
+    }
+  </style>
+  <script type="module" crossorigin src="/BRTorrentsWeb/assets/index-Bx4pfWke.js"></script>
+  <link rel="stylesheet" crossorigin href="/BRTorrentsWeb/assets/index-CaQ_kJ74.css">
+</head>
+
+<body>
+
+  <!-- =====================================================
+       ACESSIBILIDADE
+       ===================================================== -->
+
+  <noscript>
+    <div
+      style="
+        padding: 24px;
+        background: #121713;
+        color: #F1F5F2;
+        font-family: sans-serif;
+        text-align: center;
+      "
+    >
+      O BRTorrents precisa de JavaScript habilitado
+      para funcionar corretamente.
+    </div>
+  </noscript>
+
+  <!-- =====================================================
+       APLICAÇÃO
+       ===================================================== -->
+
+  <div id="app">
+    <div class="initial-loader" role="status">
+      <div
+        class="initial-loader-indicator"
+        aria-hidden="true"
+      ></div>
+
+      <span>Carregando BRTorrents...</span>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       JAVASCRIPT PRINCIPAL
+       ===================================================== -->
+
+
+</body>
+</html>

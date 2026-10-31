@@ -5,8 +5,8 @@
    Architecture: Vanilla JavaScript / ES Modules
    ========================================================= */
 
-import "../styles/global.css";
-import "../styles/components.css";
+import "./styles/global.css";
+import "./styles/components.css";
 
 import { Home } from "./pages/home.js";
 import { Configure } from "./pages/configure.js";
