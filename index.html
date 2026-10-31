@@ -1,59 +1,78 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <!-- =====================================================
-       BRTORRENTS — MAIN HTML DOCUMENT
-       Version: 1.0.0
-       ===================================================== -->
+  <!-- ================================================
+       BRTORRENTS — DOCUMENTO PRINCIPAL
+       ================================================ -->
 
-  <!-- Metadados essenciais -->
   <meta charset="UTF-8">
 
+  <!-- Compatibilidade e viewport -->
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- ================================================
+       IDENTIDADE DO SITE
+       ================================================ -->
+
+  <title>BRTorrents — Seu catálogo, do seu jeito</title>
+
   <meta
     name="description"
-    content="Configure e personalize seu addon BRTorrents com uma interface simples, rápida e intuitiva."
+    content="Conheça o BRTorrents: uma plataforma moderna para organizar e configurar seu catálogo de mídia."
   >
-
-  <meta name="theme-color" content="#090B0A">
-
-  <meta name="color-scheme" content="dark">
 
   <meta name="application-name" content="BRTorrents">
 
   <meta name="author" content="BRTorrents">
 
+  <meta name="theme-color" content="#07100c">
+
+  <meta name="color-scheme" content="dark">
+
   <meta name="robots" content="index, follow">
 
-  <!-- =====================================================
+  <meta
+    name="referrer"
+    content="strict-origin-when-cross-origin"
+  >
+
+  <!-- ================================================
        CONFIGURAÇÃO DA API
-       Substituir pelo endereço real do Cloud Run.
-       ===================================================== -->
+       Mantenha esta meta tag para compatibilidade
+       com o código atual do projeto.
+       ================================================ -->
 
   <meta
     name="brt-api-base"
     content="https://SUA-API-DO-CLOUD-RUN"
   >
 
-  <!-- =====================================================
-       IDENTIDADE VISUAL
-       ===================================================== -->
+  <!-- ================================================
+       ÍCONES
+       %BASE_URL% é substituído pelo Vite durante o build.
+       ================================================ -->
 
   <link
     rel="icon"
     type="image/svg+xml"
-    href="/favicon.svg"
+    href="%BASE_URL%favicon.svg"
   >
 
   <link
     rel="apple-touch-icon"
-    href="/logo.svg"
+    href="%BASE_URL%logo.svg"
   >
+
+  <!-- ================================================
+       FONTES
+       ================================================ -->
 
   <link
     rel="preconnect"
@@ -66,80 +85,296 @@
     crossorigin
   >
 
-  <!-- =====================================================
-       FONTES
-       ===================================================== -->
-
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet"
   >
 
-  <!-- =====================================================
-       TÍTULO
-       ===================================================== -->
-
-  <title>BRTorrents — Configurador</title>
-
-  <!-- =====================================================
-       SEGURANÇA
-       ===================================================== -->
+  <!-- ================================================
+       COMPARTILHAMENTO
+       ================================================ -->
 
   <meta
-    http-equiv="X-Content-Type-Options"
-    content="nosniff"
+    property="og:type"
+    content="website"
   >
 
   <meta
-    name="referrer"
-    content="no-referrer"
+    property="og:title"
+    content="BRTorrents — Seu catálogo, do seu jeito"
   >
 
-  <!-- =====================================================
-       ESTILIZAÇÃO INICIAL
-       Evita flash de fundo claro.
-       ===================================================== -->
+  <meta
+    property="og:description"
+    content="Uma experiência moderna para organizar e configurar seu catálogo de mídia."
+  >
+
+  <meta
+    property="og:locale"
+    content="pt_BR"
+  >
+
+  <meta
+    name="twitter:card"
+    content="summary"
+  >
+
+  <!-- ================================================
+       ESTILO INICIAL
+       ================================================ -->
 
   <style>
     :root {
       color-scheme: dark;
-      background: #090B0A;
+
+      --brt-background: #07100c;
+      --brt-surface: #0b1711;
+      --brt-primary: #10b981;
+      --brt-primary-light: #6ee7b7;
+      --brt-text: #ecfdf5;
+      --brt-muted: #94a39a;
+
+      background: var(--brt-background);
+      color: var(--brt-text);
+
+      font-family:
+        "DM Sans",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+
+      -webkit-tap-highlight-color: transparent;
     }
 
-    html,
-    body {
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      width: 100%;
       min-width: 320px;
       min-height: 100%;
+
       margin: 0;
-      background: #090B0A;
+      padding: 0;
+
+      background: var(--brt-background);
+
+      scroll-behavior: smooth;
+      scrollbar-color: #176b4d #07100c;
     }
 
     body {
+      width: 100%;
+      min-width: 320px;
       min-height: 100vh;
+      min-height: 100svh;
+
+      margin: 0;
+      padding: 0;
+
+      overflow-x: hidden;
+
+      background:
+        radial-gradient(
+          ellipse at 50% -20%,
+          rgba(16, 185, 129, .09),
+          transparent 55%
+        ),
+        var(--brt-background);
+
+      color: var(--brt-text);
     }
+
+    body,
+    button,
+    input,
+    textarea,
+    select {
+      font-family:
+        "DM Sans",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font-size: inherit;
+    }
+
+    button,
+    a {
+      touch-action: manipulation;
+    }
+
+    img,
+    svg {
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    ::selection {
+      background: rgba(16, 185, 129, .35);
+      color: #ffffff;
+    }
+
+    /* ================================================
+       ÁREA PRINCIPAL
+       ================================================ */
 
     #app {
+      width: 100%;
       min-height: 100vh;
+      min-height: 100svh;
+      isolation: isolate;
     }
 
+    #app[aria-busy="true"] {
+      cursor: progress;
+    }
+
+    /* ================================================
+       CARREGAMENTO INICIAL
+       ================================================ */
+
     .initial-loader {
+      position: relative;
+
       display: grid;
+      width: 100%;
       min-height: 100vh;
+      min-height: 100svh;
+
       place-content: center;
       justify-items: center;
-      gap: 16px;
-      color: #A5B0A8;
-      font-family: system-ui, sans-serif;
+
+      gap: 20px;
+
+      padding:
+        max(24px, env(safe-area-inset-top))
+        max(20px, env(safe-area-inset-right))
+        max(24px, env(safe-area-inset-bottom))
+        max(20px, env(safe-area-inset-left));
+
+      color: var(--brt-muted);
+
+      text-align: center;
+    }
+
+    .initial-loader-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .initial-loader-logo {
+      display: grid;
+
+      width: 62px;
+      height: 62px;
+
+      place-items: center;
+
+      border: 1px solid rgba(52, 211, 153, .24);
+      border-radius: 19px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(16, 185, 129, .19),
+          rgba(5, 46, 32, .35)
+        );
+
+      box-shadow:
+        0 0 35px rgba(16, 185, 129, .11),
+        inset 0 1px rgba(255, 255, 255, .04);
+
+      overflow: hidden;
+    }
+
+    .initial-loader-logo img {
+      display: block;
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: contain;
+    }
+
+    .initial-loader-name {
+      margin: 0;
+
+      color: var(--brt-text);
+
+      font-family:
+        "Outfit",
+        "DM Sans",
+        sans-serif;
+
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: -.8px;
+    }
+
+    .initial-loader-name span {
+      color: var(--brt-primary-light);
+    }
+
+    .initial-loader-message {
+      margin: 0;
+
+      color: #899990;
+
       font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .1px;
     }
 
     .initial-loader-indicator {
+      position: relative;
+
       width: 30px;
       height: 30px;
-      border: 3px solid rgba(67, 216, 121, 0.15);
-      border-top-color: #43D879;
+
+      border: 3px solid rgba(52, 211, 153, .12);
+      border-top-color: var(--brt-primary);
+
       border-radius: 50%;
-      animation: brt-loading 0.8s linear infinite;
+
+      animation:
+        brt-loading .8s linear infinite;
+    }
+
+    .initial-loader-indicator::after {
+      position: absolute;
+      inset: -7px;
+
+      border: 1px solid rgba(52, 211, 153, .07);
+      border-radius: 50%;
+
+      content: "";
     }
 
     @keyframes brt-loading {
@@ -148,7 +383,119 @@
       }
     }
 
+    /* ================================================
+       ACESSIBILIDADE
+       ================================================ */
+
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+
+      z-index: 99999;
+
+      padding: 12px 16px;
+
+      border: 1px solid rgba(110, 231, 183, .4);
+      border-radius: 10px;
+
+      background: #064e3b;
+      color: #ffffff;
+
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+
+      transform: translateY(-160%);
+      transition: transform .2s ease;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+      outline: 2px solid var(--brt-primary-light);
+      outline-offset: 3px;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--brt-primary-light);
+      outline-offset: 3px;
+    }
+
+    /* ================================================
+       MENSAGEM SEM JAVASCRIPT
+       ================================================ */
+
+    .no-script-message {
+      position: fixed;
+      inset: 16px;
+
+      z-index: 99999;
+
+      display: grid;
+      place-content: center;
+
+      padding: 24px;
+
+      border: 1px solid rgba(52, 211, 153, .2);
+      border-radius: 16px;
+
+      background: #0b1711;
+      color: #ecfdf5;
+
+      font-size: 14px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    /* ================================================
+       TELAS PEQUENAS
+       ================================================ */
+
+    @media (max-width: 480px) {
+      .initial-loader {
+        gap: 17px;
+      }
+
+      .initial-loader-logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 17px;
+      }
+
+      .initial-loader-name {
+        font-size: 23px;
+      }
+
+      .initial-loader-message {
+        max-width: 260px;
+        font-size: 12px;
+      }
+    }
+
+    /* ================================================
+       TELAS GRANDES
+       ================================================ */
+
+    @media (min-width: 1600px) {
+      body {
+        font-size: 15px;
+      }
+    }
+
+    /* ================================================
+       MOVIMENTO REDUZIDO
+       ================================================ */
+
     @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+
       .initial-loader-indicator {
         animation: none;
       }
@@ -158,43 +505,79 @@
 
 <body>
 
-  <!-- =====================================================
+  <!-- ================================================
        ACESSIBILIDADE
-       ===================================================== -->
+       ================================================ -->
+
+  <a class="skip-link" href="#app">
+    Pular para o conteúdo
+  </a>
 
   <noscript>
-    <div
-      style="
-        padding: 24px;
-        background: #121713;
-        color: #F1F5F2;
-        font-family: sans-serif;
-        text-align: center;
-      "
-    >
-      O BRTorrents precisa de JavaScript habilitado
-      para funcionar corretamente.
+    <div class="no-script-message">
+      <div>
+        <strong>JavaScript desativado</strong>
+        <p>
+          O BRTorrents precisa de JavaScript habilitado
+          para funcionar corretamente.
+          Ative o JavaScript no navegador e recarregue a página.
+        </p>
+      </div>
     </div>
   </noscript>
 
-  <!-- =====================================================
+  <!-- ================================================
        APLICAÇÃO
-       ===================================================== -->
+       ================================================ -->
 
-  <div id="app">
-    <div class="initial-loader" role="status">
+  <div
+    id="app"
+    aria-busy="true"
+  >
+
+    <!-- Carregamento exibido antes do JavaScript -->
+
+    <div
+      class="initial-loader"
+      role="status"
+      aria-live="polite"
+    >
+
+      <div class="initial-loader-brand">
+
+        <div class="initial-loader-logo">
+          <img
+            src="%BASE_URL%logo.svg"
+            alt=""
+            width="62"
+            height="62"
+            fetchpriority="high"
+          >
+        </div>
+
+        <h1 class="initial-loader-name">
+          BR<span>Torrents</span>
+        </h1>
+
+      </div>
+
       <div
         class="initial-loader-indicator"
         aria-hidden="true"
       ></div>
 
-      <span>Carregando BRTorrents...</span>
+      <p class="initial-loader-message">
+        Preparando sua experiência...
+      </p>
+
     </div>
+
   </div>
 
-  <!-- =====================================================
+  <!-- ================================================
        JAVASCRIPT PRINCIPAL
-       ===================================================== -->
+       O Vite ajusta o caminho no build.
+       ================================================ -->
 
   <script
     type="module"
