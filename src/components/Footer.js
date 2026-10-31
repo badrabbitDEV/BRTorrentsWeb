@@ -271,7 +271,7 @@ export function Footer() {
   const description = createElement(
     "p",
     "footer-description",
-    "Uma plataforma para organizar e configurar seu catálogo de mídia com uma experiência simples e moderna."
+    "Um addon para melhorar seu catálogo de filmes e séries com uma experiência simples e moderna."
   );
 
   brandColumn.append(brand, description);
@@ -357,7 +357,7 @@ export function Footer() {
   const disclaimer = createElement(
     "p",
     "footer-disclaimer",
-    "Utilize a plataforma somente para organizar e acessar conteúdos próprios, de domínio público ou cuja distribuição você tenha autorização."
+    "O Melhor Indexador de Torrents chega em breve! Previsao: 15/11/26."
   );
 
   container.append(main, bottom, disclaimer);
