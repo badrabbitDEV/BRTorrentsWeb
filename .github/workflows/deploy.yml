@@ -1,4 +1,4 @@
-name: Deploy BRTorrents Web
+name: BRTorrents Web
 
 on:
   push:
