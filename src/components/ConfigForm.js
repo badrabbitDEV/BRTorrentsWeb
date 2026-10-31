@@ -1,238 +1,263 @@
 
-const LIMITS = Object.freeze({
-  name: 60
-});
-
-const ALLOWED_LANGUAGES = Object.freeze([
-  "pt-BR",
-  "en",
-  "es"
+const QUALITIES = Object.freeze([
+  { value: "4k", label: "4K", detail: "2160p" },
+  { value: "1080p", label: "Full HD", detail: "1080p" },
+  { value: "720p", label: "HD", detail: "720p" },
+  { value: "sd", label: "SD", detail: "480p" }
 ]);
 
-const ALLOWED_QUALITIES = Object.freeze([
-  "4k",
-  "1080p",
-  "720p",
-  "480p"
+const AUDIO_OPTIONS = Object.freeze([
+  { value: "dublado", label: "Dublado", detail: "Português do Brasil" },
+  { value: "legendado", label: "Legendado", detail: "Áudio original" }
+]);
+
+const DEBRID_PROVIDERS = Object.freeze([
+  { value: "none", label: "Nenhum", description: "Usar o sistema padrão" },
+  { value: "realdebrid", label: "Real-Debrid", description: "Real-Debrid" },
+  { value: "alldebrid", label: "AllDebrid", description: "AllDebrid" },
+  { value: "premiumize", label: "Premiumize", description: "Premiumize" },
+  { value: "torbox", label: "TorBox", description: "TorBox" }
 ]);
 
 const DEFAULTS = Object.freeze({
-  name: "",
-  language: "pt-BR",
-  quality: "1080p",
-  subtitles: true,
-  enabled: true
+  qualities: ["4k", "1080p", "720p", "sd"],
+  audio: ["dublado", "legendado"],
+  debrid: "none",
+  apiKey: ""
 });
 
-function normalizeName(value) {
-  if (typeof value !== "string") {
-    return "";
-  }
-
-  return value
-    .normalize("NFC")
-    .trim()
-    .replace(/\s+/g, " ")
-    .slice(0, LIMITS.name);
-}
-
-function collectFormData(form) {
-  if (!(form instanceof HTMLFormElement)) {
-    throw new TypeError("Formulário inválido.");
-  }
-
-  const formData = new FormData(form);
-
-  const name = normalizeName(formData.get("name"));
-  const language = formData.get("language");
-  const quality = formData.get("quality");
-
-  if (!ALLOWED_LANGUAGES.includes(language)) {
-    throw new Error("Selecione um idioma válido.");
-  }
-
-  if (!ALLOWED_QUALITIES.includes(quality)) {
-    throw new Error("Selecione uma qualidade válida.");
-  }
-
-  return Object.freeze({
-    name,
-    language,
-    quality,
-    subtitles: formData.get("subtitles") === "on",
-    enabled: formData.get("enabled") === "on"
-  });
-}
-
-function createElement(tag, attributes = {}, text = "") {
+function createElement(tag, className, text) {
   const element = document.createElement(tag);
 
-  for (const [key, value] of Object.entries(attributes)) {
-    if (key === "className") {
-      element.className = value;
-    } else if (key === "textContent") {
-      element.textContent = value;
-    } else {
-      element.setAttribute(key, String(value));
-    }
-  }
-
-  if (text) {
-    element.textContent = text;
-  }
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
 
   return element;
 }
 
-export function ConfigForm({
-  onChange = () => {},
-  onSubmit = () => {}
-} = {}) {
+function createOption(option, groupName, checked) {
+  const label = createElement("label", "config-option");
+  const input = document.createElement("input");
+
+  input.type = "checkbox";
+  input.name = groupName;
+  input.value = option.value;
+  input.checked = checked;
+  input.dataset.option = "true";
+
+  const indicator = createElement("span", "option-indicator");
+  indicator.setAttribute("aria-hidden", "true");
+
+  const content = createElement("span", "option-content");
+  const title = createElement("strong", "option-title", option.label);
+  const detail = createElement("small", "option-detail", option.detail);
+
+  content.append(title, detail);
+  label.append(input, indicator, content);
+
+  return label;
+}
+
+function collectFormData(form) {
+  const qualities = Array.from(
+    form.querySelectorAll('input[name="quality"]:checked')
+  ).map(input => input.value);
+
+  const audio = Array.from(
+    form.querySelectorAll('input[name="audio"]:checked')
+  ).map(input => input.value);
+
+  const debrid = form.querySelector("#config-debrid").value;
+  const apiKey = form.querySelector("#config-api-key").value.trim();
+
+  if (qualities.length === 0) {
+    throw new Error("Selecione pelo menos uma qualidade de vídeo.");
+  }
+
+  if (audio.length === 0) {
+    throw new Error("Selecione pelo menos um tipo de áudio.");
+  }
+
+  if (!DEBRID_PROVIDERS.some(provider => provider.value === debrid)) {
+    throw new Error("Selecione um provedor válido.");
+  }
+
+  if (debrid !== "none" && !apiKey) {
+    throw new Error("Informe a API Key do provedor selecionado.");
+  }
+
+  return Object.freeze({
+    qualities,
+    audio,
+    debrid,
+    apiKey
+  });
+}
+
+export function ConfigForm({ onChange = () => {} } = {}) {
   if (typeof onChange !== "function") {
     throw new TypeError("onChange precisa ser uma função.");
   }
 
-  if (typeof onSubmit !== "function") {
-    throw new TypeError("onSubmit precisa ser uma função.");
-  }
-
   const form = document.createElement("form");
-
   form.className = "config-form";
   form.noValidate = true;
   form.autocomplete = "off";
 
-  form.innerHTML = `
-    <div class="form-header">
-      <h2>Configurar BRTorrents</h2>
-      <p>Personalize as preferências do seu addon.</p>
-    </div>
+  const header = createElement("div", "form-header");
+  header.append(
+    createElement("h2", "", "Personalize seu BRTorrents"),
+    createElement("p", "", "Escolha como deseja encontrar e reproduzir seus conteúdos.")
+  );
 
-    <div class="form-group">
-      <label for="config-name">Nome da configuração</label>
-      <input
-        id="config-name"
-        name="name"
-        type="text"
-        maxlength="${LIMITS.name}"
-        placeholder="Minha configuração"
-        autocomplete="off"
-      >
-      <small>Máximo de ${LIMITS.name} caracteres.</small>
-    </div>
+  const qualitySection = createElement("section", "config-section");
+  qualitySection.append(
+    createElement("h3", "config-section-title", "Qualidade de vídeo"),
+    createElement("p", "config-section-description", "Selecione uma ou mais qualidades.")
+  );
 
-    <div class="form-group">
-      <label for="config-language">Idioma</label>
-      <select id="config-language" name="language" required>
-        <option value="pt-BR">Português (Brasil)</option>
-        <option value="en">English</option>
-        <option value="es">Español</option>
-      </select>
-    </div>
+  const qualityGrid = createElement("div", "config-option-grid");
 
-    <div class="form-group">
-      <label for="config-quality">Qualidade preferida</label>
-      <select id="config-quality" name="quality" required>
-        <option value="4k">4K</option>
-        <option value="1080p" selected>1080p</option>
-        <option value="720p">720p</option>
-        <option value="480p">480p</option>
-      </select>
-    </div>
+  QUALITIES.forEach(option => {
+    qualityGrid.append(
+      createOption(option, "quality", DEFAULTS.qualities.includes(option.value))
+    );
+  });
 
-    <div class="form-options">
-      <label class="form-checkbox">
-        <input
-          type="checkbox"
-          name="subtitles"
-          checked
-        >
-        <span>Preferir legendas</span>
-      </label>
+  qualitySection.append(qualityGrid);
 
-      <label class="form-checkbox">
-        <input
-          type="checkbox"
-          name="enabled"
-          checked
-        >
-        <span>Ativar configuração</span>
-      </label>
-    </div>
+  const audioSection = createElement("section", "config-section");
+  audioSection.append(
+    createElement("h3", "config-section-title", "Áudio"),
+    createElement("p", "config-section-description", "Escolha os idiomas desejados.")
+  );
 
-    <button type="submit" class="config-submit">
-      Salvar configuração
-    </button>
+  const audioGrid = createElement("div", "config-option-grid audio-grid");
 
-    <p
-      class="form-status"
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-    ></p>
-  `;
+  AUDIO_OPTIONS.forEach(option => {
+    audioGrid.append(
+      createOption(option, "audio", DEFAULTS.audio.includes(option.value))
+    );
+  });
 
-  const nameInput = form.querySelector("#config-name");
-  const status = form.querySelector(".form-status");
-  const submitButton = form.querySelector('[type="submit"]');
+  audioSection.append(audioGrid);
 
-  function showStatus(message, type = "info") {
-    status.textContent = message;
-    status.dataset.state = type;
+  const debridSection = createElement("section", "config-section");
+  debridSection.append(
+    createElement("h3", "config-section-title", "Provedor de Debrid"),
+    createElement("p", "config-section-description", "Integração opcional com seu provedor.")
+  );
+
+  const providerGroup = createElement("div", "form-group");
+  const providerLabel = createElement("label", "", "Selecione seu provedor");
+  providerLabel.htmlFor = "config-debrid";
+
+  const providerSelect = document.createElement("select");
+  providerSelect.id = "config-debrid";
+  providerSelect.name = "debrid";
+
+  DEBRID_PROVIDERS.forEach(provider => {
+    const option = document.createElement("option");
+    option.value = provider.value;
+    option.textContent = provider.label;
+    providerSelect.append(option);
+  });
+
+  providerGroup.append(providerLabel, providerSelect);
+
+  const apiGroup = createElement("div", "form-group api-key-group");
+  apiGroup.hidden = true;
+
+  const apiLabel = createElement("label", "", "API Key");
+  apiLabel.htmlFor = "config-api-key";
+
+  const apiInput = document.createElement("input");
+  apiInput.id = "config-api-key";
+  apiInput.name = "apiKey";
+  apiInput.type = "password";
+  apiInput.autocomplete = "off";
+  apiInput.spellcheck = false;
+  apiInput.placeholder = "Digite sua API Key...";
+
+  const apiHint = createElement(
+    "small",
+    "api-key-hint",
+    "Sua chave não será incluída na URL pública do Manifest."
+  );
+
+  const apiMessage = createElement("p", "api-key-message", "");
+
+  apiGroup.append(apiLabel, apiInput, apiHint, apiMessage);
+  debridSection.append(providerGroup, apiGroup);
+
+  const status = createElement("p", "form-status", "");
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+
+  form.append(
+    header,
+    qualitySection,
+    audioSection,
+    debridSection,
+    status
+  );
+
+  function updateProviderField() {
+    const provider = providerSelect.value;
+    const selected = DEBRID_PROVIDERS.find(item => item.value === provider);
+
+    apiGroup.hidden = provider === "none";
+
+    if (provider === "none") {
+      apiInput.value = "";
+      apiMessage.textContent = "";
+    } else {
+      apiMessage.textContent =
+        `Coloque Sua API Key do ${selected.label} aqui.`;
+    }
   }
 
   function notifyChange() {
     try {
       const data = collectFormData(form);
+      status.textContent = "";
+      status.dataset.state = "";
       onChange(data);
-      showStatus("");
     } catch (error) {
-      showStatus(error.message, "error");
+      status.textContent = error.message;
+      status.dataset.state = "error";
+
+      const partial = {
+        qualities: Array.from(
+          form.querySelectorAll('input[name="quality"]:checked')
+        ).map(input => input.value),
+        audio: Array.from(
+          form.querySelectorAll('input[name="audio"]:checked')
+        ).map(input => input.value),
+        debrid: providerSelect.value,
+        apiKey: apiInput.value.trim()
+      };
+
+      onChange(partial);
     }
   }
+
+  providerSelect.addEventListener("change", () => {
+    updateProviderField();
+    notifyChange();
+  });
 
   form.addEventListener("input", notifyChange);
   form.addEventListener("change", notifyChange);
 
-  nameInput.addEventListener("blur", () => {
-    nameInput.value = normalizeName(nameInput.value);
-  });
+  updateProviderField();
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    if (submitButton.disabled) {
-      return;
-    }
-
-    let data;
-
-    try {
-      data = collectFormData(form);
-    } catch (error) {
-      showStatus(error.message, "error");
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.setAttribute("aria-busy", "true");
-    showStatus("Salvando configuração...", "loading");
-
-    try {
-      await onSubmit(data);
-      showStatus("Configuração salva com sucesso!", "success");
-    } catch (error) {
-      showStatus(
-        error instanceof Error
-          ? error.message
-          : "Não foi possível salvar a configuração.",
-        "error"
-      );
-    } finally {
-      submitButton.disabled = false;
-      submitButton.removeAttribute("aria-busy");
-    }
+  onChange({
+    qualities: [...DEFAULTS.qualities],
+    audio: [...DEFAULTS.audio],
+    debrid: DEFAULTS.debrid,
+    apiKey: ""
   });
 
   return form;
-}
+    }
