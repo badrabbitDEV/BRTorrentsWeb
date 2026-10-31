@@ -1227,3 +1227,430 @@ button:disabled {
     text-align: left;
   }
 }
+
+
+/* =========================================================
+   BRTORRENTS — MANIFEST PREVIEW
+   EMERALD GLASS 4.0
+   Premium • Responsive • Mobile First
+   ========================================================= */
+
+.config-preview {
+  --manifest-green: #34d399;
+  --manifest-green-bright: #6ee7b7;
+  --manifest-green-dark: #059669;
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 25px;
+  overflow: hidden;
+
+  border: 1px solid rgba(52, 211, 153, .22);
+  border-radius: 23px;
+
+  background:
+    radial-gradient(
+      ellipse at 5% 0%,
+      rgba(16, 185, 129, .13),
+      transparent 48%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(17, 38, 27, .96),
+      rgba(5, 15, 9, .98)
+    );
+
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, .24),
+    inset 0 1px 0 rgba(255, 255, 255, .035);
+
+  color: var(--text);
+}
+
+.config-preview::before {
+  position: absolute;
+  z-index: -1;
+  top: -100px;
+  right: -100px;
+
+  width: 230px;
+  height: 230px;
+
+  border-radius: 50%;
+  background: rgba(16, 185, 129, .09);
+  filter: blur(65px);
+
+  content: "";
+  pointer-events: none;
+}
+
+.manifest-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  margin-bottom: 26px;
+}
+
+.manifest-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.manifest-main-icon {
+  display: grid;
+  flex: 0 0 49px;
+  place-items: center;
+
+  width: 49px;
+  height: 49px;
+
+  border: 1px solid rgba(52, 211, 153, .27);
+  border-radius: 15px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(16, 185, 129, .22),
+    rgba(16, 185, 129, .06)
+  );
+
+  color: var(--manifest-green-bright);
+  font-family: ui-monospace, monospace;
+  font-size: 1.2rem;
+  font-weight: 900;
+
+  box-shadow: 0 0 24px rgba(16, 185, 129, .09);
+}
+
+.manifest-title-group {
+  min-width: 0;
+}
+
+.config-preview .preview-title {
+  margin: 0 0 6px;
+
+  color: #ecfdf5;
+  font-size: 1.17rem;
+  font-weight: 900;
+  line-height: 1.3;
+  letter-spacing: -.45px;
+}
+
+.config-preview .preview-description {
+  margin: 0;
+
+  color: #91aa9b;
+  font-size: .84rem;
+  line-height: 1.6;
+}
+
+.manifest-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+
+  padding: 8px 10px;
+
+  border: 1px solid rgba(52, 211, 153, .2);
+  border-radius: 100px;
+
+  background: rgba(16, 185, 129, .09);
+
+  color: #86efac;
+  font-size: .65rem;
+  font-weight: 900;
+  letter-spacing: .8px;
+}
+
+.manifest-status-dot {
+  color: #34d399;
+  font-size: .55rem;
+  text-shadow: 0 0 10px rgba(52, 211, 153, .7);
+}
+
+.manifest-url-area {
+  min-width: 0;
+  margin-top: 5px;
+}
+
+.manifest-url-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin-bottom: 10px;
+}
+
+.manifest-url-label {
+  color: #9bb7a7;
+  font-size: .69rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.manifest-url-type {
+  padding: 4px 8px;
+
+  border: 1px solid rgba(52, 211, 153, .15);
+  border-radius: 6px;
+
+  background: rgba(16, 185, 129, .07);
+  color: #6ee7b7;
+
+  font-family: ui-monospace, monospace;
+  font-size: .64rem;
+  font-weight: 800;
+}
+
+.manifest-url-box {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 16px;
+
+  border: 1px solid rgba(167, 243, 208, .12);
+  border-radius: 13px;
+
+  background: rgba(2, 10, 6, .72);
+
+  box-shadow:
+    inset 0 2px 9px rgba(0, 0, 0, .18),
+    0 1px 0 rgba(255, 255, 255, .025);
+}
+
+.manifest-url {
+  display: block;
+  width: 100%;
+  max-height: 125px;
+  overflow: auto;
+
+  color: #a7f3d0;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+
+  font-size: .76rem;
+  line-height: 1.8;
+
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  user-select: text;
+}
+
+.manifest-url:focus-visible {
+  outline: 2px solid var(--manifest-green);
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+.manifest-preview-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  margin: 17px 0 22px;
+}
+
+.manifest-footer-indicator {
+  flex: 0 0 7px;
+
+  width: 7px;
+  height: 7px;
+  margin-top: 6px;
+
+  border-radius: 50%;
+  background: var(--manifest-green);
+
+  box-shadow: 0 0 12px rgba(52, 211, 153, .65);
+}
+
+.manifest-preview-footer p {
+  margin: 0;
+
+  color: #91aa9b;
+  font-size: .79rem;
+  line-height: 1.6;
+}
+
+.manifest-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 11px;
+}
+
+.manifest-install-button,
+.manifest-copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-width: 0;
+  min-height: 49px;
+  padding: 12px 15px;
+
+  border-radius: 12px;
+
+  font-family: inherit;
+  font-size: .83rem;
+  font-weight: 850;
+
+  cursor: pointer;
+
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.manifest-install-button {
+  border: 1px solid #34d399;
+
+  background: linear-gradient(
+    135deg,
+    #6ee7b7,
+    #10b981
+  );
+
+  color: #032014;
+
+  box-shadow:
+    0 7px 22px rgba(16, 185, 129, .15),
+    inset 0 1px 0 rgba(255, 255, 255, .2);
+}
+
+.manifest-copy-button {
+  border: 1px solid rgba(167, 243, 208, .19);
+  background: rgba(255, 255, 255, .035);
+  color: #d1fae5;
+}
+
+.manifest-action-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.manifest-install-button:hover {
+  border-color: #a7f3d0;
+  background: #a7f3d0;
+
+  box-shadow: 0 9px 27px rgba(16, 185, 129, .23);
+  transform: translateY(-2px);
+}
+
+.manifest-copy-button:hover {
+  border-color: rgba(52, 211, 153, .55);
+  background: rgba(16, 185, 129, .12);
+  color: #a7f3d0;
+
+  transform: translateY(-2px);
+}
+
+.manifest-install-button:active,
+.manifest-copy-button:active {
+  transform: translateY(0);
+}
+
+.manifest-install-button:focus-visible,
+.manifest-copy-button:focus-visible {
+  outline: 2px solid #a7f3d0;
+  outline-offset: 4px;
+}
+
+@media (max-width: 650px) {
+  .config-preview {
+    padding: 19px;
+    border-radius: 19px;
+  }
+
+  .manifest-preview-header {
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .manifest-main-icon {
+    flex-basis: 43px;
+    width: 43px;
+    height: 43px;
+    border-radius: 13px;
+  }
+
+  .config-preview .preview-title {
+    font-size: 1.03rem;
+  }
+
+  .config-preview .preview-description {
+    font-size: .78rem;
+  }
+
+  .manifest-status {
+    padding: 7px 8px;
+    font-size: .58rem;
+  }
+
+  .manifest-url-box {
+    padding: 13px;
+  }
+
+  .manifest-url {
+    font-size: .7rem;
+  }
+
+  .manifest-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .manifest-install-button,
+  .manifest-copy-button {
+    width: 100%;
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 380px) {
+  .config-preview {
+    padding: 15px;
+  }
+
+  .manifest-identity {
+    gap: 10px;
+  }
+
+  .manifest-main-icon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .manifest-status {
+    gap: 5px;
+    padding: 6px;
+  }
+
+  .config-preview .preview-title {
+    font-size: .95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .manifest-install-button,
+  .manifest-copy-button {
+    transition: none;
+  }
+   }
